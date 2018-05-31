@@ -14,15 +14,15 @@ APPODEAL_AUTH_KEY_NAME=xxx AF_DEV_KEY=yyy AF_PROXY_PORT=4001 go run main.go
 
 Server expects environment variables defined:
 
-#####APPODEAL_AUTH_KEY
+##### APPODEAL_AUTH_KEY
 
 Each request should send **authentication** header with APPODEAL_AUTH_KEY value.
 
-#####AF_DEV_KEY
+##### AF_DEV_KEY
 
 Authentication key required for your app in Appsflyer.
 
-#####AF_PROXY_PORT
+##### AF_PROXY_PORT
 
 Proxy will run on this port.
 
