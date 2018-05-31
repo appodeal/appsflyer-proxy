@@ -8,4 +8,4 @@ services:
     environment:
       - APPODEAL_AUTH_KEY=xxx
       - AF_DEV_KEY=yyy
-      - AF_PROXY_PORT=4001
+
