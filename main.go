@@ -1,17 +1,17 @@
 package main
 
 import (
-	"os"
 	"fmt"
-	"strconv"
-	"net/http"
-	"net"
-	"syscall"
-	"sync"
-	"os/signal"
-	"log"
 	"io/ioutil"
+	"log"
+	"net"
+	"net/http"
+	"os"
+	"os/signal"
+	"strconv"
 	"strings"
+	"sync"
+	"syscall"
 	"time"
 )
 
@@ -60,7 +60,7 @@ func main() {
 		// check header
 		requestAuth := r.Header.Get("authentication")
 		if requestAuth != appodealAuthKey {
-		  panic("authentication header "+ requestAuth+" dont match")
+			panic("authentication header " + requestAuth + " dont match")
 		}
 
 		routeParts := strings.Split(r.URL.Path, "/")
@@ -83,7 +83,6 @@ func main() {
 		// set headers for HTTP request
 		req.Header.Set("Content-Type", "application/json")
 		// set authentication key
-		log.Print("afDevKey"+afDevKey)
 		req.Header.Set("authentication", afDevKey)
 
 		// create HTTP client for AppsFlyer API
@@ -108,7 +107,6 @@ func main() {
 			body = []byte(err.Error())
 		}
 
-    log.Printf("endpoint: ('%s')", genEndpoint(appBundleID))
 		log.Printf("Response: (%d, '%s')", resp.StatusCode, string(body))
 
 		if resp.StatusCode != http.StatusOK {
@@ -130,11 +128,11 @@ func main() {
 	}()
 	log.Print("Server started")
 
-	<-signals      // wait for signals
+	<-signals // wait for signals
 	log.Println("going to shutdown...")
 	server.Close() // stop HTTP server
 	log.Println("server stopped")
-	wg.Wait()      // wait for handlers
+	wg.Wait() // wait for handlers
 	log.Println("workers done")
 }
 
@@ -146,10 +144,10 @@ func loadSettings() (afDevKey string, appodealAuthKey string, listenPort int, er
 	}
 
 	appodealAuthKey = os.Getenv(AppodealAuthKeyName)
-  if len(appodealAuthKey) == 0 {
-    err = fmt.Errorf(fmt.Sprint(AppodealAuthKeyName, " environment variable is not set!"))
-    return
-  }
+	if len(appodealAuthKey) == 0 {
+		err = fmt.Errorf(fmt.Sprint(AppodealAuthKeyName, " environment variable is not set!"))
+		return
+	}
 
 	portEnv := os.Getenv(ListenPortEnvVarName)
 	if len(portEnv) == 0 {
@@ -175,7 +173,7 @@ func genEndpoint(appBundleID string) string {
 
 // PanicProcessingMiddleware processing panics
 type PanicProcessingMiddleware struct {
-	Mux *http.ServeMux
+	Mux       *http.ServeMux
 	ErrLogger *log.Logger
 }
 
