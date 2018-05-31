@@ -16,7 +16,7 @@ import (
 )
 
 const AfDevKeyEnvVarName = "AF_DEV_KEY"
-const AppodealAuthKeyName = "APPODEAL_AUTH_KEY_NAME"
+const AppodealAuthKeyName = "APPODEAL_AUTH_KEY"
 const ListenPortEnvVarName = "AF_PROXY_PORT"
 const HandlePattern = "/appsflyer_proxy/"
 const AfBaseEndpoint = "https://api2.appsflyer.com/inappevent"
