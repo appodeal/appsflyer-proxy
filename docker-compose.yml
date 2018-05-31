@@ -1,13 +1,10 @@
 version: "2"
 
 services:
-  app:
-    image: golang:1.10.2-alpine3.7
-    volumes:
-      - .:/go/src/appsflyer-proxy
-    working_dir: /go/src/appsflyer-proxy
+  appsflyer-proxy:
+    image: appsflyer-proxy:0.1.0
     ports:
-      - "4001"
+      - "4001:4001"
     environment:
       - APPODEAL_AUTH_KEY=xxx
       - AF_DEV_KEY=yyy
