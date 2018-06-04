@@ -18,6 +18,7 @@ import (
 const AfDevKeyEnvVarName = "AF_DEV_KEY"
 const AppodealAuthKeyName = "APPODEAL_AUTH_KEY"
 const ListenPortEnvVarName = "AF_PROXY_PORT"
+const StatsDEnvVarName = "AF_STATSD"
 const HandlePattern = "/appsflyer_proxy/"
 const AfBaseEndpoint = "https://api2.appsflyer.com/inappevent"
 const HttpClientTimeout = time.Minute
@@ -25,7 +26,7 @@ const HttpClientTimeout = time.Minute
 func main() {
 	log.Print("Load settings..")
 	// get settings
-	afDevKey, appodealAuthKey, listenPort, err := loadSettings()
+	afDevKey, appodealAuthKey, listenPort, statsAddress, err := loadSettings()
 	if err != nil {
 		log.Fatal(err)
 		panic(err)
@@ -120,10 +121,12 @@ func main() {
 		w.Write(body)
 	})
 
+	stats := statsd.NewStatsD()
+
 	// Accept clients and process HTTP requests
 	log.Print("Start server")
 	go func() {
-		if err := http.Serve(server, PanicProcessingMiddleware{Mux: mux, ErrLogger: errLogger}); err != nil {
+		if err := http.Serve(server, PanicProcessingMiddleware{Stats: stats, Mux: mux, ErrLogger: errLogger}); err != nil {
 			log.Fatal(err)
 			signals <- syscall.SIGTERM
 		}
@@ -138,7 +141,7 @@ func main() {
 	log.Println("workers done")
 }
 
-func loadSettings() (afDevKey string, appodealAuthKey string, listenPort int, err error) {
+func loadSettings() (afDevKey string, appodealAuthKey string, listenPort int, sd string, err error) {
 	afDevKey = os.Getenv(AfDevKeyEnvVarName)
 	if len(afDevKey) == 0 {
 		err = fmt.Errorf(fmt.Sprint(AfDevKeyEnvVarName, " environment variable is not set!"))
@@ -166,6 +169,13 @@ func loadSettings() (afDevKey string, appodealAuthKey string, listenPort int, er
 		err = fmt.Errorf(fmt.Sprint(ListenPortEnvVarName, " must be > 0!"))
 		return
 	}
+
+	sd = os.Getenv(StatsDEnvVarName)
+	if len(sd) == 0 {
+		err = fmt.Errorf(fmt.Sprint(StatsDEnvVarName, " environment variable is not set! (example: 127.0.0.1:8125/appsflyre)"))
+		return
+	}
+
 	return
 }
 
@@ -177,13 +187,16 @@ func genEndpoint(appBundleID string) string {
 type PanicProcessingMiddleware struct {
 	Mux *http.ServeMux
 	ErrLogger *log.Logger
+	Stats *statsd.StatsD
 }
 
 // ServeHTTP serves HTTP connections
 func (s PanicProcessingMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	t := time.Now()
 	defer func() {
 		if err := recover(); err != nil {
 			err1 := fmt.Errorf("%+v", err)
+			s.Stats.Count("errors",1)
 			s.ErrLogger.Print(err1)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err1.Error()))
@@ -191,4 +204,6 @@ func (s PanicProcessingMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Requ
 	}()
 
 	s.Mux.ServeHTTP(w, r)
+	s.Stats.Count("requests",1)
+	s.Stats.Time("time",time.Since(t))
 }
