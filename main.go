@@ -136,6 +136,7 @@ func main() {
 	<-signals      // wait for signals
 	log.Println("going to shutdown...")
 	server.Close() // stop HTTP server
+	stats.Close() // stop sending stats
 	log.Println("server stopped")
 	wg.Wait()      // wait for handlers
 	log.Println("workers done")
