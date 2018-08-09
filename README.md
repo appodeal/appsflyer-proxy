@@ -38,3 +38,6 @@ curl -H "Content-Type: application/json" -H "authentication: <YOUR APPODEAL_AUTH
 - `docker run --rm --name appsflyer-proxy -e="APPODEAL_AUTH_KEY=xxx" -e="AF_DEV_KEY=yyy" -p 4001:4001 -d appsflyer-proxy:<version>` - run image on local docker (or use compose)
 - `docker push registry.appodeal.com/appodeal/appsflyer-proxy:<version>` - push prepared docker image to registry 
 
+## Deployment with Makefile
+- `make build` - build docker image
+- `make push`  - pus docker image to registry.appodeal.com
