@@ -9,7 +9,7 @@ Build and run executable.
 To just run locally:
 
 ```
-APPODEAL_AUTH_KEY_NAME=xxx AF_DEV_KEY=yyy AF_PROXY_PORT=4001 go run main.go
+APPODEAL_AUTH_KEY=xxx AF_DEV_KEY=yyy AF_PROXY_PORT=4001 go run main.go
 ```
 
 Server expects environment variables defined:
